@@ -1,5 +1,7 @@
 # Music Player App
 
+# UNDER DEVELOPMENT❗❗
+
 ## Overview
 This is a Flutter-based music player application that allows users to search for songs, browse through categories, and play their favorite music. The app features a modern design and provides a seamless user experience.
 
@@ -58,4 +60,9 @@ flutter run
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+Copyright (c) 2025 Aliyudin Saptari
+
+All rights reserved.
+
+This project is for personal use only. 
+You may not copy, modify, merge, publish, distribute, sublicense, or sell copies of this software without explicit permission.
