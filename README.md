@@ -58,4 +58,9 @@ flutter run
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+Copyright (c) 2025 Aliyudin Saptari
+
+All rights reserved.
+
+This project is for personal use only. 
+You may not copy, modify, merge, publish, distribute, sublicense, or sell copies of this software without explicit permission.
