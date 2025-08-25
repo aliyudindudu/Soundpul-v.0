@@ -825,7 +825,8 @@ class ProfilePage extends StatelessWidget {
                     const SizedBox(width: 22),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 18), // Tambahkan padding top agar data turun
+                        padding: const EdgeInsets.only(
+                            top: 18), // Tambahkan padding top agar data turun
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -866,7 +867,8 @@ class ProfilePage extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Icon(Icons.circle, color: Colors.green, size: 11),
+                                Icon(Icons.circle,
+                                    color: Colors.green, size: 11),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Online',
