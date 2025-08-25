@@ -5,8 +5,11 @@ class _ArtistCircle extends StatelessWidget {
   final String image;
   final String name;
   final String listeners;
-  const _ArtistCircle(
-      {required this.image, required this.name, required this.listeners});
+  const _ArtistCircle({
+    required this.image,
+    required this.name,
+    required this.listeners,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +18,8 @@ class _ArtistCircle extends StatelessWidget {
         ClipOval(
           child: Image.asset(
             image,
-            width: 72,
-            height: 72,
+            width: 96,
+            height: 96,
             fit: BoxFit.cover,
           ),
         ),
@@ -24,7 +27,10 @@ class _ArtistCircle extends StatelessWidget {
         Text(
           name,
           style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
         ),
         SizedBox(
           width: 80,
@@ -46,13 +52,19 @@ class _AlbumSquare extends StatelessWidget {
   final String image;
   final String title;
   final String subtitle;
-  const _AlbumSquare(
-      {required this.image, required this.title, required this.subtitle});
+  final double? width;
+  const _AlbumSquare({
+    required this.image,
+    required this.title,
+    required this.subtitle,
+    this.width,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final double w = width ?? 100;
     return SizedBox(
-      width: 100,
+      width: w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,8 +72,8 @@ class _AlbumSquare extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: Image.asset(
               image,
-              width: 100,
-              height: 100,
+              width: w,
+              height: w,
               fit: BoxFit.cover,
             ),
           ),
@@ -69,13 +81,16 @@ class _AlbumSquare extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           if (subtitle.isNotEmpty)
-            SizedBox(
-              width: 100,
+            // Ganti SizedBox menjadi Flexible agar subtitle tidak overflow
+            Flexible(
               child: Text(
                 subtitle,
                 style: const TextStyle(color: Colors.white70, fontSize: 11),
@@ -108,29 +123,63 @@ class MusicPlayerApp extends StatelessWidget {
   }
 }
 
-class MusicHomePage extends StatelessWidget {
+class MusicHomePage extends StatefulWidget {
   MusicHomePage({Key? key}) : super(key: key);
 
+  @override
+  State<MusicHomePage> createState() => _MusicHomePageState();
+}
+
+class _MusicHomePageState extends State<MusicHomePage> {
   final Color darkGrey = const Color(0xFF232323);
   final Color lightGrey = const Color(0xFF2E2E2E);
+  int _selectedIndex = 0;
+
+  void _onBottomNavTap(int index) {
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(
+            selectedIndex: 4,
+            onBottomNavTap: (i) {
+              if (i != 4) {
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: darkGrey,
+        backgroundColor: Colors.black, // Ubah jadi hitam
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white54,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: _onBottomNavTap,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.music_note), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: ''),
           BottomNavigationBarItem(
-            icon: CircleAvatar(radius: 14, backgroundColor: Colors.grey),
+            icon: CircleAvatar(
+              radius: 14,
+              backgroundImage: AssetImage('assets/images/profile/profile.jpg'),
+              backgroundColor: Colors.grey,
+            ),
             label: '',
           ),
         ],
@@ -144,15 +193,68 @@ class MusicHomePage extends StatelessWidget {
               // Profile & Search
               Row(
                 children: [
-                  const CircleAvatar(
-                    radius: 26,
-                    backgroundColor: Colors.grey,
+                  // Avatar kiri atas jadi tombol ke ProfilePage
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ProfilePage()),
+                      );
+                    },
+                    child: const CircleAvatar(
+                      radius: 26,
+                      backgroundImage:
+                          AssetImage('assets/images/profile/profile.jpg'),
+                      backgroundColor: Colors.grey,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Container(),
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: lightGrey,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 16),
+                          const Expanded(
+                            child: Text(
+                              'Find your favorite music',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.search, color: Colors.white),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
+              ),
+              // Tambahkan tulisan Last listened to di bawah search bar
+              const SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Color(0xFF2E2E2E),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'Last listened to',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               // Now Playing Card
@@ -202,7 +304,7 @@ class MusicHomePage extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: Image.asset(
-                        'assets/images/happiness.jpg',
+                        'assets/images/music/happiness.jpg',
                         width: 100,
                         height: 100,
                         fit: BoxFit.cover,
@@ -214,73 +316,129 @@ class MusicHomePage extends StatelessWidget {
               const SizedBox(height: 16),
               // Filter Buttons
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
                   FilterButton(text: 'All', selected: true),
+                  SizedBox(width: 12),
                   FilterButton(text: 'Trend'),
+                  SizedBox(width: 12),
                   FilterButton(text: 'Leaderboard'),
                 ],
               ),
               const SizedBox(height: 16),
               // Artist List
-              Row(
+              Column(
                 children: [
-                  Expanded(child: ArtistTile(image: Colors.blueGrey, name: 'Hindia')),
-                  SizedBox(width: 12),
-                  Expanded(child: ArtistTile(image: Colors.grey, name: 'Rex Orange County')),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(child: ArtistTile(image: Colors.black, name: 'Radiohead', isLogo: true)),
-                  SizedBox(width: 12),
-                  Expanded(child: ArtistTile(image: Colors.blue, name: 'Wave to Earth')),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(child: ArtistTile(image: Colors.brown, name: 'Sheila On 7')),
-                  SizedBox(width: 12),
-                  Expanded(child: ArtistTile(image: Colors.indigo, name: 'Coldplay')),
+                  Row(
+                    children: const [
+                      Expanded(
+                        child: ArtistTile(
+                          image: Colors.transparent,
+                          name: 'Hindia',
+                          imageAsset: 'assets/images/music/hindia.jpg',
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: ArtistTile(
+                          image: Colors.transparent,
+                          name: 'Rex Orange County',
+                          imageAsset: 'assets/images/music/rexorange.jpg',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: const [
+                      Expanded(
+                        child: ArtistTile(
+                          image: Colors.transparent,
+                          name: 'Radiohead',
+                          imageAsset: 'assets/images/music/radiohead.jpg',
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: ArtistTile(
+                          image: Colors.transparent,
+                          name: 'Wave to Earth',
+                          imageAsset: 'assets/images/music/wavetoearth.jpg',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: const [
+                      Expanded(
+                        child: ArtistTile(
+                          image: Colors.transparent,
+                          name: 'Sheila On 7',
+                          imageAsset: 'assets/images/music/sheilaon7.jpg',
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: ArtistTile(
+                          image: Colors.transparent,
+                          name: 'Coldplay',
+                          imageAsset: 'assets/images/music/coldplay.jpg',
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
-              // Daily Mixes
-              SizedBox(
-                height: 130,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    DailyMixCard(
-                      color: Colors.red,
-                      index: '01',
-                      artists:
-                          'Rex Orange County, Coldplay, Ricky Montgomery, Maroon 5',
-                    ),
-                    const SizedBox(width: 8),
-                    DailyMixCard(
-                      color: Colors.green,
-                      index: '02',
-                      artists:
-                          'Tulus, Sheila On 7, Nidji, Fourtwnty, Nadhif Basalamah',
-                    ),
-                    const SizedBox(width: 8),
-                    DailyMixCard(
-                      color: Colors.orange,
-                      index: '03',
-                      artists:
-                          'Reality Club, NIKI, Sal Priadi, Payung Teduh, Noah',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Mini Player
 
-              // --- Popular Artist Section ---
+              // Daily Mixes (responsive, 3 cards fit screen)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  double cardSpacing = 8;
+                  double cardWidth =
+                      (constraints.maxWidth - 2 * cardSpacing) / 3;
+                  // Tambah tinggi agar tidak overflow di device kecil
+                  return SizedBox(
+                    height: cardWidth + 60, // tambah sedikit dari 48 ke 60
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        DailyMixCard(
+                          color: Colors.red,
+                          index: '01',
+                          artists:
+                              'Rex Orange County, Coldplay, Ricky Montgomery, Maroon 5',
+                          imagePath: 'assets/images/music/happiness.jpg',
+                          width: cardWidth,
+                        ),
+                        SizedBox(width: cardSpacing),
+                        DailyMixCard(
+                          color: Colors.green,
+                          index: '02',
+                          artists:
+                              'Tulus, Sheila On 7, Nidji, Fourtwnty, Nadhif Basalamah',
+                          imagePath: 'assets/images/music/tulus.jpg',
+                          width: cardWidth,
+                        ),
+                        SizedBox(width: cardSpacing),
+                        DailyMixCard(
+                          color: Colors.orange,
+                          index: '03',
+                          artists:
+                              'Reality Club, NIKI, Sal Priadi, Payung Teduh, Noah',
+                          imagePath: 'assets/images/music/realityc.jpg',
+                          width: cardWidth,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
               const SizedBox(height: 24),
+              // Popular Artist Section
               const Text(
                 'Popular Artist',
                 style: TextStyle(
@@ -292,26 +450,31 @@ class MusicHomePage extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: const [
                   _ArtistCircle(
-                    image: 'assets/images/niki.jpg',
+                    image: 'assets/images/music/niki.jpg',
                     name: 'NIKI',
-                    listeners: '22 million monthly listener',
+                    listeners: '22 million monthly listeners',
                   ),
                   _ArtistCircle(
-                    image: 'assets/images/sombr.jpg',
+                    image: 'assets/images/music/sombr.jpg',
                     name: 'Sombr',
-                    listeners: '48.6 million monthly listener',
+                    listeners: '48.6 million monthly listeners',
                   ),
                   _ArtistCircle(
-                    image: 'assets/images/tyler.jpg',
-                    name: 'Tyler the creator',
-                    listeners: '43 million monthly listener',
+                    image: 'assets/images/music/tyler.jpg',
+                    name: 'Tyler the Creator',
+                    listeners: '43 million monthly listeners',
+                  ),
+                  _ArtistCircle(
+                    image: 'assets/images/music/billie.jpg',
+                    name: 'Billie Eilish',
+                    listeners: '57 million monthly listeners',
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
+              // Indonesian Music
               const Text(
                 'Indonesian Music',
                 style: TextStyle(
@@ -321,30 +484,79 @@ class MusicHomePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _AlbumSquare(
-                    image: 'assets/images/mantu_idaman.jpg',
-                    title: 'Mantu Idaman',
-                    subtitle: 'Rombongan bodong koplo, necu...',
-                  ),
-                  _AlbumSquare(
-                    image: 'assets/images/mejikuhibiniu.jpg',
-                    title: 'Mejikuhibiniu',
-                    subtitle: 'Tomi, Suisei, Jemsi',
-                  ),
-                  _AlbumSquare(
-                    image: 'assets/images/tabola_bale.jpg',
-                    title: 'Tabola Bale',
-                    subtitle: 'Sileb open up, Jacson Seran...',
-                  ),
-                ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  double spacing = 8;
+                  double albumWidth = (constraints.maxWidth - 3 * spacing) / 4;
+                  return SizedBox(
+                    // Tinggi tetap, tapi isi albumSquare sekarang flexible
+                    height: albumWidth + 54,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: albumWidth,
+                              maxWidth: albumWidth,
+                            ),
+                            child: _AlbumSquare(
+                              image: 'assets/images/music/mantu_idaman.jpg',
+                              title: 'Mantu Idaman',
+                              subtitle: 'Rombongan bodong koplo, necu...',
+                              width: albumWidth,
+                            ),
+                          ),
+                          SizedBox(width: spacing),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: albumWidth,
+                              maxWidth: albumWidth,
+                            ),
+                            child: _AlbumSquare(
+                              image: 'assets/images/music/mejikuhibiniu.jpg',
+                              title: 'Mejikuhibiniu',
+                              subtitle: 'Tomi, Suisei, Jemsi',
+                              width: albumWidth,
+                            ),
+                          ),
+                          SizedBox(width: spacing),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: albumWidth,
+                              maxWidth: albumWidth,
+                            ),
+                            child: _AlbumSquare(
+                              image: 'assets/images/music/tabola_bale.jpg',
+                              title: 'Tabola Bale',
+                              subtitle: 'Sileb open up, Jacson Seran...',
+                              width: albumWidth,
+                            ),
+                          ),
+                          SizedBox(width: spacing),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: albumWidth,
+                              maxWidth: albumWidth,
+                            ),
+                            child: _AlbumSquare(
+                              image: 'assets/images/music/nidji.jpg',
+                              title: 'Nidji Hits',
+                              subtitle: 'Nidji, Giring, Rama',
+                              width: albumWidth,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-
               const SizedBox(height: 24),
+              // Suggested Albums
               const Text(
-                'Suggested albums',
+                'Suggested Albums',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -354,20 +566,25 @@ class MusicHomePage extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: const [
                   _AlbumSquare(
-                    image: 'assets/images/rex.jpg',
+                    image: 'assets/images/music/rexorange.jpg',
                     title: 'Rex Orange County Playlist',
                     subtitle: '',
                   ),
                   _AlbumSquare(
-                    image: 'assets/images/arctic.jpg',
-                    title: 'Arctic Monkey Play.',
+                    image: 'assets/images/music/arcticm.jpg',
+                    title: 'Arctic Monkeys Playlist',
                     subtitle: '',
                   ),
                   _AlbumSquare(
-                    image: 'assets/images/pamungkas.jpg',
+                    image: 'assets/images/music/pamungkas.jpg',
                     title: 'Pamungkas Playlist',
+                    subtitle: '',
+                  ),
+                  _AlbumSquare(
+                    image: 'assets/images/music/nangid.jpg',
+                    title: 'Janji Ga nangid',
                     subtitle: '',
                   ),
                 ],
@@ -409,11 +626,14 @@ class ArtistTile extends StatelessWidget {
   final Color image;
   final String name;
   final bool isLogo;
+  final String? imageAsset; // tambahkan untuk gambar
+
   const ArtistTile({
     Key? key,
     required this.image,
     required this.name,
     this.isLogo = false,
+    this.imageAsset,
   }) : super(key: key);
 
   @override
@@ -431,9 +651,20 @@ class ArtistTile extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: image,
-              borderRadius: BorderRadius.circular(isLogo ? 8 : 20),
+              color: imageAsset == null ? image : null,
+              borderRadius: BorderRadius.circular(12), // kotak dengan sudut 12
             ),
+            child: imageAsset != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      imageAsset!,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(width: 8),
           Text(
@@ -450,74 +681,311 @@ class ArtistTile extends StatelessWidget {
   }
 }
 
+// DailyMixCard (DIPERBARUI)
 class DailyMixCard extends StatelessWidget {
   final Color color;
   final String index;
   final String artists;
+  final String imagePath;
+  final double? width;
+
   const DailyMixCard({
     Key? key,
     required this.color,
     required this.index,
     required this.artists,
+    this.imagePath = 'assets/images/placeholder.jpg',
+    this.width,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final double cardWidth = width ?? 100;
     return Container(
-      height: 120,
+      width: cardWidth,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
         color: const Color(0xFF2E2E2E),
-        borderRadius: BorderRadius.circular(16),
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            left: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
+          Image.asset(
+            imagePath,
+            height: cardWidth,
+            width: cardWidth,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            width: cardWidth,
+            color: color,
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Daily Mix',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  const Text(
-                    'Daily Mix',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  index,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    index,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          Positioned.fill(
-            top: 36,
+          // Gunakan Flexible agar teks tidak overflow
+          Flexible(
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.fromLTRB(6, 6, 6, 2),
               child: Text(
                 artists,
                 style: const TextStyle(
                   color: Colors.white70,
-                  fontSize: 13,
+                  fontSize: 11,
+                  height: 1.1,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Tambahkan halaman ProfilePage sesuai desain
+class ProfilePage extends StatelessWidget {
+  final int selectedIndex;
+  final void Function(int)? onBottomNavTap;
+  const ProfilePage({Key? key, this.selectedIndex = 4, this.onBottomNavTap})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Color darkGrey = const Color(0xFF232323);
+    final Color lightGrey = const Color(0xFF2E2E2E);
+
+    return Scaffold(
+      backgroundColor: darkGrey,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: selectedIndex,
+        onTap: onBottomNavTap ??
+            (i) {
+              if (i != 4) Navigator.pop(context);
+            },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.music_note), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: ''),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              radius: 14,
+              backgroundImage: AssetImage('assets/images/profile/profile.jpg'),
+              backgroundColor: Colors.grey,
+            ),
+            label: '',
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 38, 18, 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Foto profil di kiri, data di kanan
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 62,
+                      backgroundImage:
+                          AssetImage('assets/images/profile/profile.jpg'),
+                      backgroundColor: Colors.grey,
+                    ),
+                    const SizedBox(width: 22),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 18), // Tambahkan padding top agar data turun
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Dempull',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Icon(Icons.edit, color: Colors.white, size: 16),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'aliyudindudu@gmail.com',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.5,
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(Icons.mail, color: Colors.red, size: 13),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(Icons.circle, color: Colors.green, size: 11),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Online',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    height: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                // Bio/status kecil, background abu, rounded, shadow tipis
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: lightGrey,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.10),
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    'Let Me Fly You To The Moon',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.normal,
+                      fontSize: 13,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Tombol Edit & Apply kecil
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 80,
+                      height: 34,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
+                        ),
+                        onPressed: () {},
+                        child: const Text('Edit',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    SizedBox(
+                      width: 80,
+                      height: 34,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
+                        ),
+                        onPressed: () {},
+                        child: const Text('Apply',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Setting & Privacy
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF444444),
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
+                  child: Row(
+                    children: [
+                      Icon(Icons.settings, color: Colors.white, size: 24),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Setting & Privacy',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
