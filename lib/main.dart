@@ -135,6 +135,9 @@ class _MusicHomePageState extends State<MusicHomePage> {
   final Color lightGrey = const Color(0xFF2E2E2E);
   int _selectedIndex = 0;
 
+  // Tambahkan controller untuk search
+  final TextEditingController _searchController = TextEditingController();
+
   void _onBottomNavTap(int index) {
     if (index == 4) {
       Navigator.push(
@@ -220,18 +223,31 @@ class _MusicHomePageState extends State<MusicHomePage> {
                       child: Row(
                         children: [
                           const SizedBox(width: 16),
-                          const Expanded(
-                            child: Text(
-                              'Find your favorite music',
-                              style: TextStyle(
-                                color: Colors.white70,
+                          // Ganti Text menjadi TextField agar bisa diketik
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              style: const TextStyle(
+                                color: Colors.white,
                                 fontSize: 16,
                               ),
+                              decoration: const InputDecoration(
+                                hintText: 'Find your favorite music',
+                                hintStyle: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                                border: InputBorder.none,
+                                isCollapsed: true,
+                              ),
+                              cursorColor: Colors.white54,
                             ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.search, color: Colors.white),
-                            onPressed: () {},
+                            onPressed: () {
+                              // Bisa tambahkan aksi search di sini jika perlu
+                            },
                           ),
                         ],
                       ),
